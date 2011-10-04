@@ -1,0 +1,43 @@
+
+ * Preconditions / definitions:
+ * - A Project has Activities
+ * - An Activity has a start time, a duration and an end time
+ * - An Activity B can succeed an Activity A. A becomes a "predecessor" to B, and B a "successor" to A.
+ * - An Activity can have one successor
+ * - An Activity can have many predecessors
+ * - An Activity can only start when all its predecessors have finished
+ * - Frontloading is the process of finding the earliest start time for an activity
+ * - When an activity has a start and end time it has been planned
+ * - When all activities have been planned, the frontloading process is completed
+ *
+ * Use case algorithm:
+ * 1. Find all Activities of a Project
+ * 2. Reset start and end times of all Activities
+ * 3. Traverse all Activities
+ * 4. Find Predecessors of current Activity in the iteration
+ * 5. Check if all of those Predecessors are planned
+ * 6a. YES: Plan this activity - set start time to latest Predecessor finish time
+ * 6b. NO:  Go to next Activity
+ * 7. Exit traversal when all Activities are planned (we might loop existing Activities several times)
+ *
+ *
+ *
+ * FrontLoaderRole = Frontloader
+ * TraversedActivityRole =
+ *
+ *
+ * This example only has 2 Roles in the FrontLoadContext since the Data model operates with a unified entity
+ * composite containing both Activity and Dependency Data (Trygves example has separated those and therefore
+ * utilizes sepearate Roles - "Predecessors" (dependencies) and Activity.
+ *
+ * Discussions of this example:
+ *
+ * @See Execution model imitated from:
+ * @See http://heim.ifi.uio.no/~trygver/2009/bb4plan.pdf
+ *
+ * Excellent SmallTalk analysis from Brian (candlerb) in order to understand Trygves example:
+ * @See http://groups.google.com/group/object-composition/browse_thread/thread/854df3a328e1c263/5f6985a4cebf86b5
+ *
+ * Discussions of the frontloader example:
+ * @See http://groups.google.com/group/object-composition/browse_thread/thread/9e2b3e28803fca44/aa8a2d7aa2f4a7cb
+ * @See http://groups.google.com/group/object-composition/browse_thread/thread/f2345a1f6d46b5c2/f69d10d813b1cf0d

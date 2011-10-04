@@ -1,0 +1,421 @@
+Hi guys,
+
+I have modified the frontloader example containing recursion, and simplified it hugely.  
+
+The aim is not to make the simplest solution of a toy example, rather it is to examine the different ways of implementing DCI to solve the same problem, in order to determine if the execution model needs additional rules or tweaks.  
+
+So, the modifications involve two tiny little steps:
+
+1) I do role mappings up front for all objects in the graph, rather than mapping on the fly.  The upfront mapping is done in the context, before the interaction is started.  This is OK, because in the context of "frontloading", we know that projects consist of activities (the role), rather than tasks (the data).  Previously I was using the context to cast tasks into activities at the time I needed an activity.
+
+2) I have let go of the idea that role-methods need to be injected into objects.  I have left them just hanging there, in mid-air, not belonging to anything.  I'm just being creative after having a beer, to see what happens...
+
+My context code now looks like this:
+
+	public void frontLoadFrom(Date projectStart){
+		
+		//casts the project into a front loader role, so it can plan itself.
+		//AT THE SAME TIME, it casts all child tasks into the activity role!!!
+		//that is ok, because in the context of frontloading, we know that 
+		//a project consists of activities!
+		//this means there is NO NEED for a role method to know the current context, or indeed
+		//create a new one.
+		frontLoader = bi.assignRolesMagically(project);
+		
+		//start the interaction
+		frontLoader_Role.frontloadFrom(projectStart, frontLoader.getActivities());
+	}
+
+Two lines of code - nice and simple.
+
+The text "frontLoader_Role." which is before the role-method call "frontloadFrom(date, listOfActivities)" can be considered to be just a namespace (but this code does compile and run in a standard JVM).
+
+And now my role-method:
+
+	public static void frontloadFrom(Date projectStart, List<IActivity_Role> currentActivities) {
+
+		for(IActivity_Role activity : currentActivities){
+			
+			if(activity.hasBeenPlanned()) continue;
+
+			//call myself recursively with predecessors
+			frontloadFrom(projectStart, activity.getPredecessors());
+
+			//finally we can plan this task, because all predecessors are now planned
+			activity_Role.frontloadFrom(projectStart, activity);
+		}
+	}
+
+A loop, and three lines of code.  So much simpler!  No dependency on the current context!
+
+For completeness, here is the activity role method, and afterwards the two interfaces which each role has:
+
+	public static void frontloadFrom(Date projectStart, IActivity_Role activity) {
+		// set my earlyStart to the maximum of projectStart and
+		// the earlyFinish of all predecessors
+		Date earliest = projectStart;
+		for(IActivity_Role predecessor : activity.getPredecessors()){
+			if(predecessor.getEnd().after(earliest)){
+				earliest = predecessor.getEnd();
+			}
+		}
+		activity.setStart(earliest);
+	}
+
+	-----------
+	
+	/** methodless role (interface) for activity, applicable to task */
+	public static interface IActivity_Role {
+
+		/** a list of activities, which must come before this one */
+		List<IActivity_Role> getPredecessors();
+		
+		public boolean hasBeenPlanned();
+		Date getEnd();
+		void setStart(Date start);
+	}
+	
+	-----------
+	
+	/** methodless role (interface) for front loader, applicable to project */
+	public static interface IFrontLoader_Role {
+		List<IActivity_Role> getActivities();
+	}
+
+	
+Anyone spot anything?
+
+Anyone dislike what I have done?
+
+There is one more tiny step required in introducing an alternative execution model.  I'll post more tomorrow...
+=============================
+
+I have moved into the sixth generation of my front loading example, and I need to add one more small step in order to complete it.
+
+This final step happens at the end of the interaction, within the context.  It is the opposite of assigning roles, namely "unassigning" roles.
+
+The two role methods from yesterday remain the same.  This final step modifies just the context, which now looks like this:
+
+	public void frontLoadFrom(Date projectStart){
+		
+		//casts the project into a front loader role, so it can plan itself.
+		//AT THE SAME TIME, it casts all tasks into the activity role!!!
+		//that is ok, because in the context of frontloading, we know that 
+		//a project consists of activities!
+		//this means there is NO NEED for a role method to need to know the current context, or indeed
+		//create a new one.
+		frontLoader = bi.assignRolesMagically(project);
+		
+		frontLoader_Role.frontloadFrom(projectStart, frontLoader.getActivities()); //start the interaction
+		
+		//in this modified execution model, we also unassign roles!!
+		bi.unassignRolesMagically(project, frontLoader);
+	}
+
+Can anyone spot anything now?
+
+Would anyone disagree that this code is much simpler than any of the previous examples of the front loader that I have posted?
+
+Does anyone think it is *not* DCI?  (apart from not injecting methods into objects of course)
+
+Think about this magical assigning and unassigning of roles - what is happening in there?
+
+I'll explain the unassigning shortly...
+
+====================
+
+I shall continue.  I have taken the sixth generation code and modified
+it.  It is the identical code to the previous posting, but with
+differently named classes and variables - the seventh generation.
+
+The context:
+
+        public void frontLoadFrom(Date projectStart){
+
+                //casts the project into a front loader role, so it can plan itself.
+                //AT THE SAME TIME, it casts all tasks into the activity role!!!
+                //that is ok, because in the context of frontloading, we know that
+                //a project consists of activities!
+                //this means there is NO NEED for a role method to need to know the
+current context, or indeed
+                //create a new one.
+                frontLoaderTO = mapper.mapFromProject(project);
+
+                FrontLoaderService.frontloadFrom(projectStart,
+frontLoaderTO.getActivities()); //start the interaction
+
+                //in this modified execution model, we also unassign roles!!
+                mapper.mergeResults(project, frontLoaderTO);
+        }
+
+----
+
+The role-method for the project (aka a service-method in the
+FrontLoaderService):
+
+        public static void frontloadFrom(Date projectStart, List<IActivityTO>
+currentActivities) {
+
+                for(IActivityTO activity : currentActivities){
+
+                        if(activity.hasBeenPlanned()) continue;
+
+                        frontloadFrom(projectStart, activity.getPredecessors());
+
+                        //finally we can plan this task, because all predecessors are now
+planned
+                        ActivityService.frontloadFrom(projectStart, activity);
+                }
+        }
+
+----
+
+The role-method for the activity (aka a service-method in the
+ActivityService):
+
+        public static void frontloadFrom(Date projectStart, IActivityTO
+activity) {
+                // set my earlyStart to the maximum of projectStart and
+                // the earlyFinish of all predecessors
+                Date earliest = projectStart;
+                for(IActivityTO predecessor : activity.getPredecessors()){
+                        if(predecessor.getEnd().after(earliest)){
+                                earliest = predecessor.getEnd();
+                        }
+                }
+                activity.setStart(earliest);
+        }
+
+----
+
+Services! So, that explains the unassigning - we need to map back out
+of the service's world into our own.
+
+But eeuurrgghh!  These new names are horrible!
+
+The code no longer reads like the use case!
+
+This is definitely no longer DCI (the fourth goal from wikipedia is
+not fullfilled, although you could argue its just a syntactic
+difference, not a semantic one...)!
+
+In the sixth generation, I used a different execution model, to get to
+the same end.
+
+The seventh generation (the one in this post) went a step too far and
+it broke.
+
+Let's call this alternative execution model in the sixth generation a
+service-based execution model.
+
+I think it is really worth considering this execution model, in order
+to simplify DCI so it becomes better accepted.  DCI remains a
+paradigm, it's about separating behaviour from data, making behaviour
+first class, allowing the programmer to think in terms of use cases,
+and to avoid mappings between users- and programmers-mental-models.
+
+And, because it's simpler, we can all start using it today.  All the
+confusion of injecting methods into objects disappears.
+
+And for those hung up on wanting to bend over backwards to inject
+methods, which causes nightmares for iteration and recursion, consider
+this:
+
+    sourceAccount.transfer(destinationAccount, amount)
+
+    bankingService.transfer(sourceAccount, destinationAccount, amount)
+
+It is easily arguable that it is not the source account which does the
+transfer, rather it is something else.
+Of course the argument works both ways.  The solution is to encourage
+the user to prefer one model over the other.
+After all, the user and programmer (and perhaps analyst) need to
+debate and agree on a single model, and we are allowed to influence
+the user, so long as we are not railroading their ideas.
+
+Anyone dislike this service-based execution model?
+
+By the way, the mapping to/from transfer objects is not always
+necessary.  Within a sub-system you tend to create an object model
+which all services can use without mapping.  The mapping is just a
+means of decoupling sub-systems and happens only on entry/exit from
+such sub-systems.
+
+To use a service-based execution model, you must:
+
+1) Do all role-mapping up front.  All child data objects which may
+need to be cast to a role, must be cast up front.
+2) Do not bother to inject methods into objects.  Methods can live on
+their own!
+3) "Unassign" roles after the interaction, which means mapping back
+from the roles to your data objects, or merging the results. 
+
+====================
+
+In the interests of research (and because I'm committed / a nerd), I have created an eighth generation of the frontloading example.  It's a pure services solution.
+
+In this solution, I don't use projects, I use recipies (eg. breakfast).  A recipe does not have tasks, it has recipe steps.
+
+But when I want to plan a recipe, I can use a "project planning serivce".  That service has nothing to do with recipies at all - it knows only projects and activities!
+
+In order to plan a recipe, I map from my world (recipes) into the project world.  This is effectively casting my recipe into the role of a project, and as such is done inside a context.
+
+It highlights something important which should also be discussed, namely whether a context should be tightly coupled to the role-methods.
+
+In Trygve's execution model (EM) he states (section 4.2) that "A Role is a property of a Context and is named within the Context namespace."
+
+In the service-based EM (see sixth generation example), the service-methods use transfer objects whose interface is the equivalent of the "list of methods which a role-method requires a data object to have".  What we are doing is mapping from one view of an object into a different view.  If you ignore the injection of methods, that is basically what role-assignment in DCI is.
+
+Just as in Trygve's EM, where the methods on a data object required by a role are part of the role contract, in the service-based EM, the transfer objects are part of the service contract.
+
+But what happens if you want to make your roles reusable?  After all, roles can be assigned to *any* object, capable of playing the role.  It is quite imaginable that a company would create a library containing project planning behaviour and roles.  
+
+But, would/should they publish *contexts* as part of that library?
+
+A context is responsible for gathering data objects and casting them into roles.  The gathering can imply things like starting transactions, looking in a database, or looking in a repository, etc.
+
+The company writing the project roles / behaviour cannot anticipate what logic you will require inside your context in order to assemble the data objects.  They cannot even anticipate the data types, so in strongly typed languages, you need one context per data object type which will be assigned the role.  As such, the context cannot be provided by the creator of the roles.
+
+A namespace relates to ownership and responsibility.  If my company uses the namespace ch.maxant.some_app, then all the code in that namespace belongs to my company and is becomes my responsibility.
+
+In the service world, the transfer objects are part of the service contract.  If you publish webservices, the WSDL contains some XSD which defines the data structures that need to be passed to the service, and they are also part of the service contract.  
+
+The caller of such a service has to do the mapping from their world into those data structures, and they have to call the service.  This mapping & call is exactly what goes inside a DCI context.  That means the context is owned and written by them, not the service provider, and that means the context and service (role) have *different* namespaces!
+
+It also highlights that a context may never contain logic related to the system behaviour being implemented, because otherwise everyone re-using the role would need to re-implement that logic found in the context.  
+
+So called anemic-contexts are hence the *only* way forward.
+
+To summarise (regardless which execution model is used):
+
+1) Roles and contexts do have different namespaces.
+2) Contexts must not contain any logic which is part of the system behaviour.  Their responsibility is purely gathering data objects, casting them into roles and starting the interaction.
+
+The source code to all eight generations, including version 1.1.0 of my BehaviourInjector are available at http://www.maxant.co.uk/resources/dci_frontloading_example.zip.
+
+Cheers,
+Ant
+
+============
+
+I should give a code example to make it clearer:
+
+    public class Kitchen_Context {
+
+        private int recipeId;
+	
+        public Kitchen_Context(int recipeId){
+            this.recipeId = recipeId;
+        }
+
+        //interaction method
+        public void planRecipe(){
+		
+            //get recipe from DB
+            Recipe r = dbHelper.loadRecipe(recipeId);  //doh, I've created a dependency from 
+                                                       //the context onto a data class :-(
+			
+            //cast into role
+            Project p = castIntoRole(r, Project.class);
+			
+            //run the interaction - start planning immediately, I'm starving!
+            p.plan(new Date());
+		
+        }
+    }
+
+In this context, I have a dependency on the data class "Recipe".  But planning projects has to do with other data types too.  What if I want to plan a party?  Then I need to create a new context.
+
+What if I want package my behaviour into a library?  I cannot anticipate what data objects other people will use, so I am forced into letting them write the context :-(
+
+===================================
+
+Is DCI too restrictive when it comes to casting objects into roles?
+
+System behaviour is often reusable.  DCI helps make behaviour resuable because the behaviour in a role is assignable to any object able to play the role.  As such, reusable behaviour is encouraged.
+
+In DCI, a role requires that an object wanting to play that role, must have a certain interface in order for the role methods to be able to communicate with the data object.
+
+For example, a role might be FrontLoadingProject, which is a project able to plan itself.  A role-method in that role might be "planActivity()" which plans a single activity (this is different from what we have done in the past, but bear with me please).  That role-method may need to get the duration of the activity, which it does from the method "getDuration()" which is implemented in the data object.
+
+This requires any object that could potentially be planned, to have a method called "getDuration()".  
+
+Someone helpful creates this role and behaviour and sticks them in a library, because planning stuff is generic.
+
+A programmer called Karsten lives in Hamburg and is a proud German citizen. Karsten finds this planning library online, and being into DCI decides to use it.  Unfortunately, Karsten is forced to create a method on his data object (RezeptSchritt) called "getDuration()" even though there is a policy in his company that he must use german for all method and field names in code he writes.  He wants to call the method on his data object "getDauer()".  It makes sense, because he is trying to make his code readable to him and his team, using the same terms as found in the use-cases.
+
+Is DCI too restrictive?  What should Karsten do?
+
+(Sorry for going on and on about services, but in the service world, there is a solution to this problem, and I want DCI to be able to solve it too!)
+
+-------
+
+do an article about casting roles up front - it cannot be done in pure DCI, because even if you write a method called "getActivities" you have no where to put that state - the role methods are stateless!
+
+-----------------
+
+Hi all,
+
+I just took a good long re-read of the wikipedia page on DCI.  I picked out these points, which might help us all.  It appears we are all a little confused :-\
+
+1) Data...These classes are barely smart data, and they explicitly lack the functionality that is peculiar to support of any particular use case.
+
+    -> I think we all agree on this, no need for further discussion.
+	
+2a) Context...The Context is the class (or its instance) whose code includes the Roles for a given algorithm, scenario, or use case, as well as the code to map these Roles into objects at run time and to enact the use case. 
+
+	-> OK, I didn't appreciate the part "whose code includes the Roles".  I understand it that Risto actually implements the role methods inside his context class?  In Qi4J this is not the case from the examples I have looked at.  In my examples, this is not the case.  In the C# examples I have seen its not.  I wonder, does this sentence really mean, the role-methods are coded in that Context class?  Because later on, it becomes a little flappy when it talks about interactions (ie mentions traits which can be programmed outside of a class).  I am happy for this to mean that the role-method implementation *is* found inside the context class - but it's a shame, because it means current strongly typed languages cannot support role-method re-use (see previous postings on dependencies between data object type and context).  In Trygve's EM, he says that contexts and roles simply share the same namespace.
+
+2b) Implementing DCI...Implementation techniques differ across programming languages. What is common to most approaches is that Roles are represented by such constructs as generics, templates, *classes*, or traits. 
+
+	-> Oh.  So are they part of the context class, or are they their own classes? I guess this is where some of this confusion comes from.
+	
+3a) Context... Role methods run in the context of an object that is selected by the Context to play that Role for the current use case enactment.
+
+	-> This is the only text in the entire page which contains the word "select".  For me, "select" has two meanings:
+
+		a) We can select objects based upon an ID, eg. loading them from a database.  For me, that can happen anywhere, inside or outside of a context, even inside a role-method which starts a sub-context.  It's not defined in DCI.
+		b) Selection to play a role - meaning that the context knows that the first parameter is the object which will play e.g. a source account, and the second is an object which will play e.g. the destination account.
+
+3b) Execution Model...The Context first finds the objects that are to take part in this use case enactment. These objects may be anywhere in the environment, or in a database, or created on the fly; DCI does not restrict these objects.
+
+	-> Oh...  So there it is, selection in both senses of the word (aka finding) occur in the context!  But this does not stipulate that such selection *must* occur in the context. I take it as designers choice.
+		
+4) Context...A Context is instantiated at the beginning of the enactment of an *algorithm*, *scenario*, or *use case*.
+
+	-> This is a clear and bold statement, stating that it is *not* just use-cases which are implemented in DCI.  A few of you keep making statements to the effect that DCI is only about use-cases.  It is not.
+	
+5) Interaction...This means that Interactions—the Role methods—are generic.
+
+	-> That is a clear and bold statement, that they can also be re-used.  If they can be re-used, then in certain languages today they may not be contained within the context (see other threads).
+
+6) "By 2006 he had a working design model, and his discovery in 2008 of Schärli's work on Traits provided the keystone that would provide natural programming language expression of these ideas. "
+
+	-> Traits at runtime are associated with objects, so that your code likes like this: object.callMethodFromTrait(), ie are put/added/injected into objects.  Why not consider methods to be seperate from objects?  So far, only Rune has given me an answer to this question (which I found only partially satisfactory)...
+
+7) History..."Many key advances in the past twenty years of object-orientation exhibit components of DCI. While no one of them fully provides the DCI computational model, the overlap suggests that the problems addressed by DCI are longstanding and fundamental."
+
+	-> Indeed, SOA exhibits components of DCI too!  If SOA were to have a dictionary: 
+
+			- service-methods=role-methods,
+			- mappings=role-assignment, where the service-object=role or role-contract,
+			
+		and turn the code which does the mapping and service-call 
+		into a class called a context, 
+		it would almost be DCI, except that it does not inject 
+		service-methods into service-objects.  I apologise, I
+		should stop throwing such radical ideas into this forum.
+	
+Additionally, I will make these statements:
+
+a) role-methods can only be addressed (called) inside a context.
+
+b) if use cases are made up of use case steps, which are implemented in role-methods, then it is feasible that an individual role-method could be re-used in a different use case.
+
+c) a role may be meaningless without a context (altho I'm unsure what that means), but a role-method which implements an algorithm or part thereof, is not meaningless.  It is an algorithm, and requires "self" to have certain methods (the role-contract).  As such, it could be re-usable.
+
+d) EM: "Third, the Context invokes a Role method on the first object to take part in the use case." -> this to me is "starting the interaction".  There is no interaction object or class in my world, just the notion of starting an interaction.  How is it in other peoples world?
+
+e) Could we define the term "role-contract", to be "the list of methods which role-methods require data objects to have in order to play the role"?  That would be quite useful and would save me typing that phrase over and over :-)  @James: please add that to Wikipedia?
+
+Everyone clear?  Any problems?

@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Junit">
+    <CLASSES>
+      <root url="file://$M2_REPO$/junit/junit/4.8.1" />
+      <root url="file://$M2_REPO$/org/junit" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$M2_REPO$/junit/junit/4.8.1" recursive="false" />
+    <jarDirectory url="file://$M2_REPO$/org/junit" recursive="false" />
+  </library>
+</component>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com</groupId>
+    <artifactId>frontloading</artifactId>
+    <version>0.1-SNAPSHOT</version>
+    <name>Frontloading</name>
+    <packaging>pom</packaging>
+
+    <properties>
+        <version.qi4j-core>1.2</version.qi4j-core>
+        <version.slf4j>1.6.0</version.slf4j>
+    </properties>
+
+    <developers>
+        <developer>
+            <id>marcgrue</id>
+            <name>Marc Grue</name>
+            <email>marc@grue.info</email>
+            <timezone>UTC+1</timezone>
+        </developer>
+    </developers>
+
+    <dependencies>
+        <!-- Qi4j     -->
+        <dependency>
+            <groupId>org.qi4j.core</groupId>
+            <artifactId>qi4j-core-api</artifactId>
+            <version>${version.qi4j-core}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.qi4j.core</groupId>
+            <artifactId>qi4j-core-spi</artifactId>
+            <version>${version.qi4j-core}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.qi4j.core</groupId>
+            <artifactId>qi4j-core-bootstrap</artifactId>
+            <version>${version.qi4j-core}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.qi4j.core</groupId>
+            <artifactId>qi4j-core-runtime</artifactId>
+            <version>${version.qi4j-core}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.qi4j.library</groupId>
+            <artifactId>qi4j-lib-constraints</artifactId>
+            <version>${version.qi4j-core}</version>
+        </dependency>
+
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${version.slf4j}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.7</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

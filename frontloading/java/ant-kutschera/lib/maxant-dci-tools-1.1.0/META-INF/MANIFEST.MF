@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Export-Package: ch.maxant.dci.util
+Bundle-Version: 1.1.0.201010262100
+Bundle-Name: maxant-dci-tools
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: maxant-dci-tools
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+
