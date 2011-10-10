@@ -16,9 +16,9 @@ Code is organized by example -> language -> contributor. So far we have the foll
 The use case of transferring an amount from one account to another.
 
 * **java**
-   * [[Ant Kutschera|https://github.com/DCI/dci-examples/tree/master/moneytransfer/java/ant-kutschera]]
+   * [Ant Kutschera](https://github.com/DCI/dci-examples/tree/master/moneytransfer/java/ant-kutschera)
 * **java-qi4j**
-   * [[Marc Grue|https://github.com/DCI/dci-examples/tree/master/moneytransfer/java-qi4j/marc-grue]]
+   * [Marc Grue](https://github.com/DCI/dci-examples/tree/master/moneytransfer/java-qi4j/marc-grue)
 
 
 ## Frontloading
@@ -26,6 +26,6 @@ The use case of transferring an amount from one account to another.
 Frontloading is a use case for computing the earliest start of every activity given the start of the project. The example is interesting in that the re-selection of objects is an essential part of the algorithm.   
 
 * **java**
-   * [[Ant Kutschera|https://github.com/DCI/dci-examples/tree/master/frontloading/java/ant-kutschera]]
+   * [Ant Kutschera](https://github.com/DCI/dci-examples/tree/master/frontloading/java/ant-kutschera)
 * **java-qi4j**
-   * [[Marc Grue|https://github.com/DCI/dci-examples/tree/master/frontloading/java-qi4j/marc-grue]]
+   * [Marc Grue](https://github.com/DCI/dci-examples/tree/master/frontloading/java-qi4j/marc-grue)
