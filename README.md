@@ -19,6 +19,8 @@ The use case of transferring an amount from one account to another.
    * [Ant Kutschera](https://github.com/DCI/dci-examples/tree/master/moneytransfer/java/ant-kutschera)
 * **java-qi4j**
    * [Marc Grue](https://github.com/DCI/dci-examples/tree/master/moneytransfer/java-qi4j/marc-grue)
+* **php**
+   * [Risto Välimäki](https://github.com/DCI/dci-examples/tree/master/moneytransfer/php/risto-valimaki)
 
 
 ## Frontloading
