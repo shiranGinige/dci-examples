@@ -1,0 +1,11 @@
+<Configuration>
+  <CoverageFilters>
+    <IncludeFilters>
+      <Filter ModuleMask="*" ClassMask="*" FunctionMask="*" />
+    </IncludeFilters>
+    <ExcludeFilters />
+  </CoverageFilters>
+  <SnapshotDialog>
+    <InitialDirectory>C:\projects\horsdal-on-github\DCI-Examples\dci-examples\moneytransfer\csharp\christian-horsdal\DCI+ASP.NET-MVC</InitialDirectory>
+  </SnapshotDialog>
+</Configuration>
