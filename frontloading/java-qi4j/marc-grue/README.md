@@ -5,12 +5,12 @@
 
 ## Resources
 
-* Forum post: [[Shift of Mental Model from Data to Roles - Qi4j Frontloading in 5 versions|http://groups.google.com/group/object-composition/browse_thread/thread/1c4c8c503f33e98a/f98b6faef02dd9b1?q=frontloading&lnk=ol&]]
-* Forum post: [[Frontloading Example|http://groups.google.com/group/object-composition/browse_thread/thread/f2345a1f6d46b5c2/f69d10d813b1cf0d]]
-* Forum post: [[Multiple context execution in controller|http://groups.google.com/group/object-composition/browse_thread/thread/9e2b3e28803fca44/aa8a2d7aa2f4a7cb]]
-* Execution model imitated from [[Trygve Reenskaug's SmallTalk implementation|http://heim.ifi.uio.no/~trygver/2009/bb4plan.pdf]]
-* Excellent SmallTalk [[analysis from Brian (candlerb)|http://groups.google.com/group/object-composition/browse_thread/thread/854df3a328e1c263/5f6985a4cebf86b5]] in order to understand Trygves example.
-* [[Qi4j|http://www.qi4j.org/]]
+* [Shift of Mental Model from Data to Roles - Qi4j Frontloading in 5 versions](http://groups.google.com/group/object-composition/browse_thread/thread/1c4c8c503f33e98a/f98b6faef02dd9b1?q=frontloading&lnk=ol&)
+* [Frontloading Example](http://groups.google.com/group/object-composition/browse_thread/thread/f2345a1f6d46b5c2/f69d10d813b1cf0d)
+* [Multiple context execution in controller](http://groups.google.com/group/object-composition/browse_thread/thread/9e2b3e28803fca44/aa8a2d7aa2f4a7cb)
+* Execution model imitated from [Trygve Reenskaug's SmallTalk implementation](http://heim.ifi.uio.no/~trygver/2009/bb4plan.pdf)
+* Excellent SmallTalk [analysis from Brian (candlerb)](http://groups.google.com/group/object-composition/browse_thread/thread/854df3a328e1c263/5f6985a4cebf86b5) in order to understand Trygves example.
+* [Qi4j home](http://www.qi4j.org/)
 
 ## Comments
 
