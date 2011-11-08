@@ -10,9 +10,9 @@ Below you'll find an overview of the different versions and some of the reasonin
 
 ## Discussions
 
-* [[Java/Qi4j Money Transfer example in 6 versions|http://groups.google.com/group/object-composition/browse_thread/thread/643ba009b1648cd0/f8a2acaa703384db?lnk=gst&q=money+transfer#f8a2acaa703384db]]
-* [[DCI-Qi4j moneytransfer version 9|http://groups.google.com/group/object-composition/browse_thread/thread/6879bf511184b91b/d330177fa2b55d62?q=]]
-* [[Shift of Mental model from Data to Roles - new v10 of Qi4j MoneyTransfer/PayBills|http://groups.google.com/group/object-composition/browse_thread/thread/4f456185c736326b/ca50d714b71fde8a?q=]]
+* [Java/Qi4j Money Transfer example in 6 versions](http://groups.google.com/group/object-composition/browse_thread/thread/643ba009b1648cd0/f8a2acaa703384db?lnk=gst&q=money+transfer#f8a2acaa703384db)
+* [DCI-Qi4j moneytransfer version 9](http://groups.google.com/group/object-composition/browse_thread/thread/6879bf511184b91b/d330177fa2b55d62?q=)
+* [Shift of Mental model from Data to Roles - new v10 of Qi4j MoneyTransfer/PayBills](http://groups.google.com/group/object-composition/browse_thread/thread/4f456185c736326b/ca50d714b71fde8a?q=)
 
 
 ## Versions
